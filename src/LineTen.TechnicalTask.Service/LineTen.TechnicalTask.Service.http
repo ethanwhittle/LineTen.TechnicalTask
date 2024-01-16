@@ -1,0 +1,6 @@
+@LineTen.TechnicalTask.Service_HostAddress = http://localhost:5171
+
+GET {{LineTen.TechnicalTask.Service_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

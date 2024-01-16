@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Import Project="..\..\build\AnalysisPackages.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\LineTen.TechnicalTask.Domain\LineTen.TechnicalTask.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
