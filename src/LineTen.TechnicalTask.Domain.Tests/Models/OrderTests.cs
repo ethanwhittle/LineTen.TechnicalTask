@@ -1,32 +1,10 @@
+using LineTen.TechnicalTask.Domain.Enums;
+using LineTen.TechnicalTask.Domain.Models;
+
 namespace LineTen.TechnicalTask.Domain.Tests.Models
 {
     public class OrderTests
     {
-        public enum OrderStatus : int
-        {
-            None = 0,
-            New = 1,
-            PaymentReceived = 2,
-            PaymentFailed = 3,
-            InProgress = 4,
-            Completed = 5,
-            Closed = 6,
-            Cancelled = 7
-        }
-
-        public class Order
-        {
-            public int ProductId { get; init; }
-
-            public int CustomerId { get; init; }
-
-            public OrderStatus Status { get; init; }
-
-            public DateTime CreatedDate { get; init; }
-
-            public DateTime UpdatedDate { get; init; }
-        }
-
         private readonly Order _testClass;
         private readonly int _productId;
         private readonly int _customerId;
