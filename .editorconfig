@@ -1,0 +1,69 @@
+﻿[*.cs]
+
+# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.DocumentationRules'
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = none
+dotnet_diagnostic.SA0001.severity=silent
+dotnet_diagnostic.SA1500.severity=silent
+dotnet_diagnostic.SA1501.severity=silent
+dotnet_diagnostic.SA1502.severity=silent
+dotnet_diagnostic.SA1504.severity=silent
+dotnet_diagnostic.SA1508.severity=silent
+dotnet_diagnostic.SA1509.severity=silent
+dotnet_diagnostic.SA1510.severity=silent
+dotnet_diagnostic.SA1511.severity=silent
+dotnet_diagnostic.SA1512.severity=silent
+dotnet_diagnostic.SA1513.severity=silent
+dotnet_diagnostic.SA1515.severity=silent
+dotnet_diagnostic.SA1518.severity=silent
+dotnet_diagnostic.SA1200.severity=silent
+dotnet_diagnostic.SA1203.severity=silent
+dotnet_diagnostic.SA1202.severity=silent
+dotnet_diagnostic.SA1201.severity=silent
+dotnet_diagnostic.SA1204.severity=silent
+dotnet_diagnostic.SA1205.severity=silent
+dotnet_diagnostic.SA1206.severity=silent
+dotnet_diagnostic.SA1207.severity=silent
+dotnet_diagnostic.SA1208.severity=silent
+dotnet_diagnostic.SA1209.severity=warning
+dotnet_diagnostic.SA1214.severity=silent
+dotnet_diagnostic.SA1216.severity=silent
+dotnet_diagnostic.SA1217.severity=silent
+dotnet_diagnostic.SA1101.severity=silent
+dotnet_diagnostic.SA1028.severity=silent
+dotnet_diagnostic.SA1025.severity=silent
+dotnet_diagnostic.SA1128.severity=silent
+dotnet_diagnostic.SA1505.severity=warning
+dotnet_diagnostic.SA1127.severity=silent
+dotnet_diagnostic.SA1309.severity=silent
+dotnet_diagnostic.SA1310.severity=silent
+dotnet_diagnostic.SA1400.severity=silent
+dotnet_diagnostic.SA1413.severity=silent
+# CA1014: Mark assemblies with CLSCompliant
+dotnet_diagnostic.CA1014.severity = none
+
+# CA1308: Normalize strings to uppercase
+dotnet_diagnostic.CA1308.severity = none
+
+# CA1034: Nested types should not be visible
+dotnet_diagnostic.CA1034.severity = none
+
+# CA1724: Do not name classes the same as namespaces
+dotnet_diagnostic.CA1724.severity = none
+
+# CA1054: URI-like parameters should not be strings
+dotnet_diagnostic.CA1054.severity = none
+
+# CA1056: URI-like properties should not be strings
+dotnet_diagnostic.CA1056.severity = none
+
+# CA1819: Properties should not return arrays
+dotnet_diagnostic.CA1819.severity = none
+
+# CA2227: Collection properties should be read only
+dotnet_diagnostic.CA2227.severity = none
+
+# CA1031:Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = none
+
+[*]
+dotnet_diagnostic.SA0001.severity = none
