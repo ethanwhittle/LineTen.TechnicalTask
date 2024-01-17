@@ -11,6 +11,10 @@
   <Import Project="..\..\build\TestPackages.targets" />
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\LineTen.TechnicalTask.Data\LineTen.TechnicalTask.Data.csproj" />
   </ItemGroup>
 
