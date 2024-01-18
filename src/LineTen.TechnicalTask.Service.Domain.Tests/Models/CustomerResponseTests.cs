@@ -1,18 +1,7 @@
+using LineTen.TechnicalTask.Service.Domain.Models;
+
 namespace LineTen.TechnicalTask.Service.Domain.Tests.Models
 {
-    public class CustomerResponse
-    {
-        public int Id { get; set; }
-
-        public string FirstName { get; set; } = null!;
-
-        public string LastName { get; set; } = null!;
-
-        public string Phone { get; set; } = null!;
-
-        public string Email { get; set; } = null!;
-    }
-
     public class CustomerResponseTests
     {
         private readonly CustomerResponse _testClass;
