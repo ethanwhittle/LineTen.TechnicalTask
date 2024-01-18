@@ -1,16 +1,7 @@
+using LineTen.TechnicalTask.Service.Domain.Models;
+
 namespace LineTen.TechnicalTask.Service.Domain.Tests.Models
 {
-    public class ProductResponse
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; } = null!;
-
-        public string Description { get; set; } = null!;
-
-        public string SKU { get; set; } = null!;
-    }
-
     public class ProductResponseTests
     {
         private readonly ProductResponse _testClass;

@@ -1,22 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+using LineTen.TechnicalTask.Service.Domain.Models;
 
 namespace LineTen.TechnicalTask.Service.Domain.Tests.Models
 {
-    public class UpdateProductRequest
-    {
-        [Required(ErrorMessage = "Id is required.")]
-        public int Id { get; set; }
-
-        [Required(ErrorMessage = "Name is required.")]
-        public string Name { get; set; } = null!;
-
-        [Required(ErrorMessage = "Description is required.")]
-        public string Description { get; set; } = null!;
-
-        [Required(ErrorMessage = "SKU is required.")]
-        public string SKU { get; set; } = null!;
-    }
-
     public class UpdateProductRequestTests
     {
         private readonly UpdateProductRequest _testClass;
