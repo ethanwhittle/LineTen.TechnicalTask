@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LineTen.TechnicalTask.Data\LineTen.TechnicalTask.Data.csproj" />
+    <ProjectReference Include="..\LineTen.TechnicalTask.Service.Domain\LineTen.TechnicalTask.Service.Domain.csproj" />
   </ItemGroup>
 
 </Project>

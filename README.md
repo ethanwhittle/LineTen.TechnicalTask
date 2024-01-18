@@ -34,3 +34,4 @@ Please consider the following schema:
 - Opted to introduce an `Id` column to the Orders as I would argue the table design is weird, if you assume a composite primary key - Each customer could only order a product once!
 - Noted that we can add Orders for customers and/or products when they don't exist - FKs a future enhancement!
 - Originally planned to implement Data integration tests. Opted not to due to time constraints and as I have "kind of" achieved this with the inmemory based unit tests
+- Introduced 2 additional projects: `*.Service.Domain` and `*.Service.Domain.Tests` so that I can reference the Response Models elsewhere
