@@ -2,103 +2,109 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LineTen.TechnicalTask.Data.Tests.Entities.Sql
 {
+    public class CustomerEntity
+    {
+        // TODO: Navigation property
+
+        [Key]
+        public int Id { get; set; }
+
+        public string FirstName { get; set; } = null!;
+
+        public string LastName { get; set; } = null!;
+
+        public string Phone { get; set; } = null!;
+
+        public string Email { get; set; } = null!;
+
+        public ICollection<OrderEntity> Orders { get; set; } = null!;
+    }
+
     public class CustomerEntityTests
     {
-        public class CustomerEntity
-        {
-            // TODO: Navigation property
-
-            [Key]
-            public int Id { get; init; }
-
-            public string FirstName { get; init; } = null!;
-
-            public string LastName { get; init; } = null!;
-
-            public string Phone { get; init; } = null!;
-
-            public string Email { get; init; } = null!;
-        }
-
         private readonly CustomerEntity _testClass;
-        private readonly int _id;
-        private readonly string _firstName;
-        private readonly string _lastName;
-        private readonly string _phone;
-        private readonly string _email;
 
         public CustomerEntityTests()
         {
-            _id = 1495598628;
-            _firstName = "TestValue585154243";
-            _lastName = "TestValue923455381";
-            _phone = "TestValue1736527465";
-            _email = "TestValue2124148228";
-            _testClass = new CustomerEntity
-            {
-                Id = _id,
-                FirstName = _firstName,
-                LastName = _lastName,
-                Phone = _phone,
-                Email = _email
-            };
+            _testClass = new CustomerEntity();
         }
 
         [Fact]
-        public void CanConstruct()
+        public void CanSetAndGetId()
         {
+            // Arrange
+            var testValue = 425807208;
+
             // Act
-            var instance = new CustomerEntity();
+            _testClass.Id = testValue;
 
             // Assert
-            instance.Should().NotBeNull();
+            _testClass.Id.Should().Be(testValue);
         }
 
         [Fact]
-        public void CanInitialize()
+        public void CanSetAndGetFirstName()
         {
+            // Arrange
+            var testValue = "TestValue376717957";
+
             // Act
-            var instance = new CustomerEntity
-            {
-                Id = _id,
-                FirstName = _firstName,
-                LastName = _lastName,
-                Phone = _phone,
-                Email = _email
-            };
+            _testClass.FirstName = testValue;
 
             // Assert
-            instance.Should().NotBeNull();
+            _testClass.FirstName.Should().Be(testValue);
         }
 
         [Fact]
-        public void IdIsInitializedCorrectly()
+        public void CanSetAndGetLastName()
         {
-            _testClass.Id.Should().Be(_id);
+            // Arrange
+            var testValue = "TestValue622375035";
+
+            // Act
+            _testClass.LastName = testValue;
+
+            // Assert
+            _testClass.LastName.Should().Be(testValue);
         }
 
         [Fact]
-        public void FirstNameIsInitializedCorrectly()
+        public void CanSetAndGetPhone()
         {
-            _testClass.FirstName.Should().Be(_firstName);
+            // Arrange
+            var testValue = "TestValue1570917759";
+
+            // Act
+            _testClass.Phone = testValue;
+
+            // Assert
+            _testClass.Phone.Should().Be(testValue);
         }
 
         [Fact]
-        public void LastNameIsInitializedCorrectly()
+        public void CanSetAndGetEmail()
         {
-            _testClass.LastName.Should().Be(_lastName);
+            // Arrange
+            var testValue = "TestValue163790200";
+
+            // Act
+            _testClass.Email = testValue;
+
+            // Assert
+            _testClass.Email.Should().Be(testValue);
         }
 
         [Fact]
-        public void PhoneIsInitializedCorrectly()
+        public void CanSetAndGetOrders()
         {
-            _testClass.Phone.Should().Be(_phone);
-        }
+            // Arrange
+            var testValue = Substitute.For<ICollection<OrderEntity>>();
 
-        [Fact]
-        public void EmailIsInitializedCorrectly()
-        {
-            _testClass.Email.Should().Be(_email);
+            // Act
+            _testClass.Orders = testValue;
+
+            // Assert
+            _testClass.Orders.Should().BeSameAs(testValue);
         }
     }
 }

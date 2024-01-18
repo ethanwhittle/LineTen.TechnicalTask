@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
+using LineTen.TechnicalTask.Data.Tests.Entities.Sql;
 using LineTen.TechnicalTask.Domain.Enums;
 using LineTen.TechnicalTask.Domain.Models;
-using static LineTen.TechnicalTask.Data.Tests.Entities.Sql.CustomerEntityTests;
-using static LineTen.TechnicalTask.Data.Tests.Entities.Sql.OrderEntityTests;
-using static LineTen.TechnicalTask.Data.Tests.Entities.Sql.ProductEntityTests;
 
 namespace LineTen.TechnicalTask.Data.Tests.Mappings
 {

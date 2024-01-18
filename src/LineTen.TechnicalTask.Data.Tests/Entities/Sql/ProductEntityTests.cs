@@ -2,91 +2,94 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LineTen.TechnicalTask.Data.Tests.Entities.Sql
 {
+    public class ProductEntity
+    {
+        // TODO: Navigation property
+
+        [Key]
+        public int Id { get; set; }
+
+        public string Name { get; set; } = null!;
+
+        public string Description { get; set; } = null!;
+
+        public string SKU { get; set; } = null!;
+
+        public ICollection<OrderEntity> Orders { get; set; } = null!;
+    }
+
     public class ProductEntityTests
     {
-        public class ProductEntity
-        {
-            // TODO: Navigation property
-
-            [Key]
-            public int Id { get; init; }
-
-            public string Name { get; init; } = null!;
-
-            public string Description { get; init; } = null!;
-
-            public string SKU { get; init; } = null!;
-        }
-
-        private readonly ProductEntity _testClass;
-        private readonly int _id;
-        private readonly string _name;
-        private readonly string _description;
-        private readonly string _sKU;
+        private ProductEntity _testClass;
 
         public ProductEntityTests()
         {
-            _id = 408485393;
-            _name = "TestValue1682786041";
-            _description = "TestValue1512516772";
-            _sKU = "TestValue1750663484";
-            _testClass = new ProductEntity
-            {
-                Id = _id,
-                Name = _name,
-                Description = _description,
-                SKU = _sKU
-            };
+            _testClass = new ProductEntity();
         }
 
         [Fact]
-        public void CanConstruct()
+        public void CanSetAndGetId()
         {
+            // Arrange
+            var testValue = 1569922024;
+
             // Act
-            var instance = new ProductEntity();
+            _testClass.Id = testValue;
 
             // Assert
-            instance.Should().NotBeNull();
+            _testClass.Id.Should().Be(testValue);
         }
 
         [Fact]
-        public void CanInitialize()
+        public void CanSetAndGetName()
         {
+            // Arrange
+            var testValue = "TestValue416920284";
+
             // Act
-            var instance = new ProductEntity
-            {
-                Id = _id,
-                Name = _name,
-                Description = _description,
-                SKU = _sKU
-            };
+            _testClass.Name = testValue;
 
             // Assert
-            instance.Should().NotBeNull();
+            _testClass.Name.Should().Be(testValue);
         }
 
         [Fact]
-        public void IdIsInitializedCorrectly()
+        public void CanSetAndGetDescription()
         {
-            _testClass.Id.Should().Be(_id);
+            // Arrange
+            var testValue = "TestValue848908530";
+
+            // Act
+            _testClass.Description = testValue;
+
+            // Assert
+            _testClass.Description.Should().Be(testValue);
         }
 
         [Fact]
-        public void NameIsInitializedCorrectly()
+        public void CanSetAndGetSKU()
         {
-            _testClass.Name.Should().Be(_name);
+            // Arrange
+            var testValue = "TestValue2111957761";
+
+            // Act
+            _testClass.SKU = testValue;
+
+            // Assert
+            _testClass.SKU.Should().Be(testValue);
         }
 
         [Fact]
-        public void DescriptionIsInitializedCorrectly()
+        public void CanSetAndGetOrders()
         {
-            _testClass.Description.Should().Be(_description);
-        }
+            // Arrange
+            var testValue = Substitute.For<ICollection<OrderEntity>>();
 
-        [Fact]
-        public void SKUIsInitializedCorrectly()
-        {
-            _testClass.SKU.Should().Be(_sKU);
+            // Act
+            _testClass.Orders = testValue;
+
+            // Assert
+            _testClass.Orders.Should().BeSameAs(testValue);
         }
     }
 }

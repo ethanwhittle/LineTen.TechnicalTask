@@ -6,6 +6,7 @@ namespace LineTen.TechnicalTask.Domain.Tests.Models
     public class OrderTests
     {
         private readonly Order _testClass;
+        private readonly int _id;
         private readonly int _productId;
         private readonly int _customerId;
         private readonly OrderStatus _status;
@@ -14,6 +15,7 @@ namespace LineTen.TechnicalTask.Domain.Tests.Models
 
         public OrderTests()
         {
+            _id = 89212789;
             _productId = 2066213427;
             _customerId = 892124983;
             _status = OrderStatus.PaymentReceived;
@@ -21,6 +23,7 @@ namespace LineTen.TechnicalTask.Domain.Tests.Models
             _updatedDate = DateTime.UtcNow;
             _testClass = new Order
             {
+                Id = _id,
                 ProductId = _productId,
                 CustomerId = _customerId,
                 Status = _status,
@@ -45,6 +48,7 @@ namespace LineTen.TechnicalTask.Domain.Tests.Models
             // Act
             var instance = new Order
             {
+                Id = _id,
                 ProductId = _productId,
                 CustomerId = _customerId,
                 Status = _status,
@@ -54,6 +58,12 @@ namespace LineTen.TechnicalTask.Domain.Tests.Models
 
             // Assert
             instance.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void IdIsInitializedCorrectly()
+        {
+            _testClass.Id.Should().Be(_id);
         }
 
         [Fact]

@@ -1,101 +1,154 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace LineTen.TechnicalTask.Data.Tests.Entities.Sql
 {
+    public class OrderEntity
+    {
+        // TODO: Navigation properties
+        [Key]
+        public int Id { get; set; }
+
+        public int ProductId { get; set; }
+
+        public int CustomerId { get; set; }
+
+        public int Status { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public DateTime UpdatedDate { get; set; }
+
+        public ProductEntity Product { get; set; } = null!;
+
+        public CustomerEntity Customer { get; set; } = null!;
+    }
+
     public class OrderEntityTests
     {
-        public class OrderEntity
-        {
-            // TODO: Navigation properties
-
-            public int ProductId { get; init; }
-
-            public int CustomerId { get; init; }
-
-            public int Status { get; init; }
-
-            public DateTime CreatedDate { get; init; }
-
-            public DateTime UpdatedDate { get; init; }
-        }
-
-        private readonly OrderEntity _testClass;
-        private readonly int _productId;
-        private readonly int _customerId;
-        private readonly int _status;
-        private readonly DateTime _createdDate;
-        private readonly DateTime _updatedDate;
+        private OrderEntity _testClass;
 
         public OrderEntityTests()
         {
-            _productId = 565426790;
-            _customerId = 2022302003;
-            _status = 1069059804;
-            _createdDate = DateTime.UtcNow;
-            _updatedDate = DateTime.UtcNow;
-            _testClass = new OrderEntity
-            {
-                ProductId = _productId,
-                CustomerId = _customerId,
-                Status = _status,
-                CreatedDate = _createdDate,
-                UpdatedDate = _updatedDate
-            };
+            _testClass = new OrderEntity();
         }
 
         [Fact]
-        public void CanConstruct()
+        public void CanSetAndGetId()
         {
+            // Arrange
+            var testValue = 372271463;
+
             // Act
-            var instance = new OrderEntity();
+            _testClass.Id = testValue;
 
             // Assert
-            instance.Should().NotBeNull();
+            _testClass.Id.Should().Be(testValue);
         }
 
         [Fact]
-        public void CanInitialize()
+        public void CanSetAndGetProductId()
         {
+            // Arrange
+            var testValue = 1225466355;
+
             // Act
-            var instance = new OrderEntity
-            {
-                ProductId = _productId,
-                CustomerId = _customerId,
-                Status = _status,
-                CreatedDate = _createdDate,
-                UpdatedDate = _updatedDate
-            };
+            _testClass.ProductId = testValue;
 
             // Assert
-            instance.Should().NotBeNull();
+            _testClass.ProductId.Should().Be(testValue);
         }
 
         [Fact]
-        public void ProductIdIsInitializedCorrectly()
+        public void CanSetAndGetCustomerId()
         {
-            _testClass.ProductId.Should().Be(_productId);
+            // Arrange
+            var testValue = 1773680417;
+
+            // Act
+            _testClass.CustomerId = testValue;
+
+            // Assert
+            _testClass.CustomerId.Should().Be(testValue);
         }
 
         [Fact]
-        public void CustomerIdIsInitializedCorrectly()
+        public void CanSetAndGetStatus()
         {
-            _testClass.CustomerId.Should().Be(_customerId);
+            // Arrange
+            var testValue = 549139642;
+
+            // Act
+            _testClass.Status = testValue;
+
+            // Assert
+            _testClass.Status.Should().Be(testValue);
         }
 
         [Fact]
-        public void StatusIsInitializedCorrectly()
+        public void CanSetAndGetCreatedDate()
         {
-            _testClass.Status.Should().Be(_status);
+            // Arrange
+            var testValue = DateTime.UtcNow;
+
+            // Act
+            _testClass.CreatedDate = testValue;
+
+            // Assert
+            _testClass.CreatedDate.Should().Be(testValue);
         }
 
         [Fact]
-        public void CreatedDateIsInitializedCorrectly()
+        public void CanSetAndGetUpdatedDate()
         {
-            _testClass.CreatedDate.Should().Be(_createdDate);
+            // Arrange
+            var testValue = DateTime.UtcNow;
+
+            // Act
+            _testClass.UpdatedDate = testValue;
+
+            // Assert
+            _testClass.UpdatedDate.Should().Be(testValue);
         }
 
         [Fact]
-        public void UpdatedDateIsInitializedCorrectly()
+        public void CanSetAndGetProduct()
         {
-            _testClass.UpdatedDate.Should().Be(_updatedDate);
+            // Arrange
+            var testValue = new ProductEntity
+            {
+                Id = 711537661,
+                Name = "TestValue517796829",
+                Description = "TestValue1041068545",
+                SKU = "TestValue1083280915",
+                Orders = Substitute.For<ICollection<OrderEntity>>()
+            };
+
+            // Act
+            _testClass.Product = testValue;
+
+            // Assert
+            _testClass.Product.Should().BeSameAs(testValue);
+        }
+
+        [Fact]
+        public void CanSetAndGetCustomer()
+        {
+            // Arrange
+            var testValue = new CustomerEntity
+            {
+                Id = 1982299221,
+                FirstName = "TestValue609958224",
+                LastName = "TestValue1512010021",
+                Phone = "TestValue1852522702",
+                Email = "TestValue1102817101",
+                Orders = Substitute.For<ICollection<OrderEntity>>()
+            };
+
+            // Act
+            _testClass.Customer = testValue;
+
+            // Assert
+            _testClass.Customer.Should().BeSameAs(testValue);
         }
     }
 }

@@ -4,6 +4,8 @@ namespace LineTen.TechnicalTask.Domain.Models
 {
     public class Order
     {
+        public int Id { get; init; }
+
         public int ProductId { get; init; }
 
         public int CustomerId { get; init; }
