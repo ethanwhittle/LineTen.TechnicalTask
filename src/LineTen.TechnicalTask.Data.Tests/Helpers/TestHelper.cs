@@ -6,11 +6,11 @@ namespace LineTen.TechnicalTask.Data.Tests.Helpers
 {
     public static class TestHelper
     {
-        public static Customer CreateCustomer(int id)
+        public static Customer CreateCustomer(int? id)
         {
             return new Customer
             {
-                Id = id,
+                Id = id ?? default,
                 FirstName = $"Customer{id}FirstName",
                 LastName = $"Customer{id}LastName",
                 Phone = $"Customer{id}Phone",
@@ -18,11 +18,11 @@ namespace LineTen.TechnicalTask.Data.Tests.Helpers
             };
         }
 
-        public static CustomerEntity CreateCustomerEntity(int id)
+        public static CustomerEntity CreateCustomerEntity(int? id)
         {
             return new CustomerEntity
             {
-                Id = id,
+                Id = id ?? default,
                 FirstName = $"Customer{id}FirstName",
                 LastName = $"Customer{id}LastName",
                 Phone = $"Customer{id}Phone",
@@ -30,33 +30,33 @@ namespace LineTen.TechnicalTask.Data.Tests.Helpers
             };
         }
 
-        public static Product CreateProduct(int id)
+        public static Product CreateProduct(int? id)
         {
             return new Product
             {
-                Id = id,
+                Id = id ?? default,
                 Name = $"Product{id}Name",
                 Description = $"Product{id}Description",
                 SKU = $"Product{id}SKU"
             };
         }
 
-        public static ProductEntity CreateProductEntity(int id)
+        public static ProductEntity CreateProductEntity(int? id)
         {
             return new ProductEntity
             {
-                Id = id,
+                Id = id ?? default,
                 Name = $"Product{id}Name",
                 Description = $"Product{id}Description",
                 SKU = $"Product{id}SKU"
             };
         }
 
-        public static Order CreateOrder(int id, int productId, int customerId)
+        public static Order CreateOrder(int? id, int productId, int customerId)
         {
             return new Order
             {
-                Id = id,
+                Id = id ?? default,
                 ProductId = productId,
                 CustomerId = customerId,
                 Status = OrderStatus.New,
@@ -65,11 +65,11 @@ namespace LineTen.TechnicalTask.Data.Tests.Helpers
             };
         }
 
-        public static OrderEntity CreateOrderEntity(int id, int productId, int customerId)
+        public static OrderEntity CreateOrderEntity(int? id, int productId, int customerId)
         {
             return new OrderEntity
             {
-                Id = id,
+                Id = id ?? default,
                 ProductId = productId,
                 CustomerId = customerId,
                 Status = (int)OrderStatus.New,

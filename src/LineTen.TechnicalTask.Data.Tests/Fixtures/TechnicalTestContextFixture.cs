@@ -10,7 +10,7 @@ namespace LineTen.TechnicalTask.Data.Tests.Fixtures
         public TechnicalTestContextFixture()
         {
             DbContextOptions = new DbContextOptionsBuilder<TechnicalTestContext>()
-                .UseInMemoryDatabase(databaseName: "InMemoryTechnicalTestDatabase")
+                .UseInMemoryDatabase(databaseName: $"InMemoryTechnicalTestDatabase{Guid.NewGuid()}")
                 .Options;
 
             using var dbContext = new TechnicalTestContext(DbContextOptions);

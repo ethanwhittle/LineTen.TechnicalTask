@@ -27,7 +27,7 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
         {
             // Arrange
             var customers = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateCustomerEntity)
+                .Select(c => TestHelper.CreateCustomerEntity(c))
                 .ToList();
 
             using (var dbContext = _fixture.CreateDbContext())
@@ -66,7 +66,7 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
         {
             // Arrange
             var customers = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateCustomerEntity)
+                .Select(c => TestHelper.CreateCustomerEntity(c))
                 .ToList();
 
             using (var dbContext = _fixture.CreateDbContext())
@@ -98,11 +98,39 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
         }
 
         [Fact]
+        public void CanAddCustomersAndExpectIdentityColumnToWork()
+        {
+            // Arrange
+            var customer = TestHelper.CreateCustomerEntity(null);
+
+            // Act
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+
+                dbContext.Customers.Add(customer);
+                dbContext.SaveChanges();
+            }
+
+            // Assert
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                var result = dbContext.Customers.Single();
+                result.Id.Should().Be(1);
+                result.FirstName.Should().Be(customer.FirstName);
+                result.LastName.Should().Be(customer.LastName);
+                result.Phone.Should().Be(customer.Phone);
+                result.Email.Should().Be(customer.Email);
+            }
+        }
+
+        [Fact]
         public void CanAddAndUpdateMultipleProducts()
         {
             // Arrange
             var products = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateProductEntity)
+                .Select(p => TestHelper.CreateProductEntity(p))
                 .ToList();
 
             using (var dbContext = _fixture.CreateDbContext())
@@ -141,7 +169,7 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
         {
             // Arrange
             var products = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateProductEntity)
+                .Select(p => TestHelper.CreateProductEntity(p))
                 .ToList();
 
             using (var dbContext = _fixture.CreateDbContext())
@@ -173,15 +201,42 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
         }
 
         [Fact]
+        public void CanAddProductsAndExpectIdentityColumnToWork()
+        {
+            // Arrange
+            var product = TestHelper.CreateProductEntity(null);
+
+            // Act
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+
+                dbContext.Products.Add(product);
+                dbContext.SaveChanges();
+            }
+
+            // Assert
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                var result = dbContext.Products.Single();
+                result.Id.Should().Be(1);
+                result.Name.Should().Be(product.Name);
+                result.Description.Should().Be(product.Description);
+                result.SKU.Should().Be(product.SKU);
+            }
+        }
+
+        [Fact]
         public void CanAddAndUpdateMultipleOrders()
         {
             // Arrange
             var customers = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateCustomerEntity)
+                .Select(c => TestHelper.CreateCustomerEntity(c))
                 .ToList();
 
             var products = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateProductEntity)
+                .Select(p => TestHelper.CreateProductEntity(p))
                 .ToList();
 
             var orders = new List<OrderEntity>();
@@ -234,11 +289,11 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
         {
             // Arrange
             var customers = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateCustomerEntity)
+                .Select(c => TestHelper.CreateCustomerEntity(c))
                 .ToList();
 
             var products = Enumerable.Range(1, 10)
-                .Select(TestHelper.CreateProductEntity)
+                .Select(p => TestHelper.CreateProductEntity(p))
                 .ToList();
 
             var orders = new List<OrderEntity>();
@@ -278,8 +333,43 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
             {
                 var remainingOrders = dbContext.Orders.ToList();
                 remainingOrders.Should().HaveCount(50);
-                remainingOrders.Should().BeEquivalentTo(expectedRemainingOrders, options => 
+                remainingOrders.Should().BeEquivalentTo(expectedRemainingOrders, options =>
                     options.Excluding(o => o.Product).Excluding(o => o.Customer));
+            }
+        }
+
+        [Fact]
+        public void CanAddOrdersAndExpectIdentityColumnToWork()
+        {
+            // Arrange
+            var customer = TestHelper.CreateCustomerEntity(1);
+
+            var product = TestHelper.CreateProductEntity(1);
+
+            var order = TestHelper.CreateOrderEntity(null, 1, 1);
+
+            // Act
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+
+                dbContext.Customers.Add(customer);
+                dbContext.Products.Add(product);
+                dbContext.Orders.Add(order);
+                dbContext.SaveChanges();
+            }
+
+            // Assert
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                var result = dbContext.Orders.Single();
+                result.Id.Should().Be(1);
+                result.CustomerId.Should().Be(1);
+                result.ProductId.Should().Be(1);
+                result.Status.Should().Be((int)OrderStatus.New);
+                result.CreatedDate.Should().Be(order.CreatedDate);
+                result.UpdatedDate.Should().Be(order.UpdatedDate);
             }
         }
     }
