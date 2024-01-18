@@ -1,20 +1,11 @@
 using AutoMapper;
 using LineTen.TechnicalTask.Domain.Enums;
 using LineTen.TechnicalTask.Domain.Models;
+using LineTen.TechnicalTask.Service.Domain.Mappings;
 using LineTen.TechnicalTask.Service.Domain.Models;
 
 namespace LineTen.TechnicalTask.Service.Domain.Tests.Mappings
 {
-    public class ResponseModelProfile : Profile
-    {
-        public ResponseModelProfile()
-        {
-            CreateMap<Customer, CustomerResponse>();
-            CreateMap<Product, ProductResponse>();
-            CreateMap<Order, OrderResponse>();
-        }
-    }
-
     public class ResponseModelProfileTests
     {
         private readonly MapperConfiguration _mapperConfiguration;
