@@ -1,22 +1,8 @@
 using LineTen.TechnicalTask.Domain.Enums;
+using LineTen.TechnicalTask.Service.Domain.Models;
 
 namespace LineTen.TechnicalTask.Service.Domain.Tests.Models
 {
-    public class OrderResponse
-    {
-        public int Id { get; set; }
-
-        public int ProductId { get; set; }
-
-        public int CustomerId { get; set; }
-
-        public OrderStatus Status { get; set; }
-
-        public DateTime CreatedDate { get; set; }
-
-        public DateTime UpdatedDate { get; set; }
-    }
-
     public class OrderResponseTests
     {
         private readonly OrderResponse _testClass;
