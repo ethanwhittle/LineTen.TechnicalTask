@@ -1,31 +1,10 @@
-using System.ComponentModel.DataAnnotations;
+using LineTen.TechnicalTask.Data.Entities.Sql;
 
 namespace LineTen.TechnicalTask.Data.Tests.Entities.Sql
 {
-    public class OrderEntity
-    {
-        // TODO: Navigation properties
-        [Key]
-        public int Id { get; set; }
-
-        public int ProductId { get; set; }
-
-        public int CustomerId { get; set; }
-
-        public int Status { get; set; }
-
-        public DateTime CreatedDate { get; set; }
-
-        public DateTime UpdatedDate { get; set; }
-
-        public ProductEntity Product { get; set; } = null!;
-
-        public CustomerEntity Customer { get; set; } = null!;
-    }
-
     public class OrderEntityTests
     {
-        private OrderEntity _testClass;
+        private readonly OrderEntity _testClass;
 
         public OrderEntityTests()
         {

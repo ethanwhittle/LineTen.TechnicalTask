@@ -1,26 +1,10 @@
-using System.ComponentModel.DataAnnotations;
+using LineTen.TechnicalTask.Data.Entities.Sql;
 
 namespace LineTen.TechnicalTask.Data.Tests.Entities.Sql
 {
-    public class ProductEntity
-    {
-        // TODO: Navigation property
-
-        [Key]
-        public int Id { get; set; }
-
-        public string Name { get; set; } = null!;
-
-        public string Description { get; set; } = null!;
-
-        public string SKU { get; set; } = null!;
-
-        public ICollection<OrderEntity> Orders { get; set; } = null!;
-    }
-
     public class ProductEntityTests
     {
-        private ProductEntity _testClass;
+        private readonly ProductEntity _testClass;
 
         public ProductEntityTests()
         {

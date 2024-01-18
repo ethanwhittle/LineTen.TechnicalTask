@@ -1,53 +1,10 @@
-using LineTen.TechnicalTask.Data.Tests.Entities.Sql;
+using LineTen.TechnicalTask.Data.DbContexts;
+using LineTen.TechnicalTask.Data.Entities.Sql;
+using LineTen.TechnicalTask.Data.Tests.Fixtures;
 using LineTen.TechnicalTask.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace LineTen.TechnicalTask.Data.Tests.DbContexts
 {
-    public class TechnicalTestContext(DbContextOptions<TechnicalTestContext> options) : DbContext(options)
-    {
-        public DbSet<CustomerEntity> Customers { get; set; } = null!;
-
-        public DbSet<ProductEntity> Products { get; set; } = null!;
-
-        public DbSet<OrderEntity> Orders { get; set; } = null!;
-    }
-
-    public class TechnicalTestContextFixture : IDisposable
-    {
-        public DbContextOptions<TechnicalTestContext> DbContextOptions { get; }
-
-        public TechnicalTestContextFixture()
-        {
-            DbContextOptions = new DbContextOptionsBuilder<TechnicalTestContext>()
-                .UseInMemoryDatabase(databaseName: "InMemoryTechnicalTestDatabase")
-                .Options;
-
-            using var dbContext = new TechnicalTestContext(DbContextOptions);
-            dbContext.Database.EnsureCreated();
-        }
-
-        public TechnicalTestContext CreateDbContext()
-        {
-            return new TechnicalTestContext(DbContextOptions);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                using var dbContext = new TechnicalTestContext(DbContextOptions);
-                dbContext.Database.EnsureDeleted();
-            }
-        }
-    }
-
     public class TechnicalTestContextTests : IClassFixture<TechnicalTestContextFixture>
     {
         private readonly TechnicalTestContextFixture _fixture;

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using LineTen.TechnicalTask.Data.Tests.Entities.Sql;
+using LineTen.TechnicalTask.Data.Entities.Sql;
 using LineTen.TechnicalTask.Domain.Enums;
 using LineTen.TechnicalTask.Domain.Models;
 
