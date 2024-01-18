@@ -96,6 +96,7 @@ namespace LineTen.TechnicalTask.Data.Tests.Repositories.Sql
         public async Task<Customer?> UpdateCustomerAsync(Customer updatedCustomer, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(updatedCustomer);
+            ArgumentOutOfRangeException.ThrowIfZero(updatedCustomer.Id);
 
             var entity = await _context.Customers.FindAsync([updatedCustomer.Id], cancellationToken).ConfigureAwait(false);
 
@@ -304,6 +305,35 @@ namespace LineTen.TechnicalTask.Data.Tests.Repositories.Sql
         public async Task CannotCallUpdateCustomerAsyncWithNullUpdatedCustomer()
         {
             await FluentActions.Invoking(() => _testClass.UpdateCustomerAsync(default(Customer), CancellationToken.None)).Should().ThrowAsync<ArgumentNullException>().WithParameterName("updatedCustomer");
+        }
+
+        [Fact]
+        public async Task CannotCallUpdateCustomerAsyncWithDefaultId()
+        {
+            // Arrange
+            var invalidCustomer = new Customer
+            {
+                Id = default,
+                FirstName = "InvalidCustomerFirstName",
+                LastName = "InvalidCustomerLastName",
+                Phone = "InvalidCustomerPhone",
+                Email = "InvalidCustomerEmail"
+            };
+
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+            }
+
+            // Act
+            await FluentActions.Invoking(() => _testClass.UpdateCustomerAsync(invalidCustomer, CancellationToken.None)).Should().ThrowAsync<ArgumentOutOfRangeException>().WithParameterName("updatedCustomer.Id");
+
+            // Assert
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                dbContext.Customers.Should().BeEmpty();
+            }
         }
     }
 }
