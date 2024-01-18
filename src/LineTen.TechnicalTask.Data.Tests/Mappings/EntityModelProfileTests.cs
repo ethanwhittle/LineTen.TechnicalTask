@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LineTen.TechnicalTask.Data.Entities.Sql;
+using LineTen.TechnicalTask.Data.Mappings;
 using LineTen.TechnicalTask.Domain.Enums;
 using LineTen.TechnicalTask.Domain.Models;
 
@@ -7,16 +8,6 @@ namespace LineTen.TechnicalTask.Data.Tests.Mappings
 {
     public class EntityModelProfileTests
     {
-        public class EntityModelProfile : Profile
-        {
-            public EntityModelProfile()
-            {
-                CreateMap<CustomerEntity, Customer>().ReverseMap();
-                CreateMap<ProductEntity, Product>().ReverseMap();
-                CreateMap<OrderEntity, Order>().ReverseMap();
-            }
-        }
-
         private readonly MapperConfiguration _mapperConfiguration;
         private readonly IMapper _mapper;
 

@@ -1,6 +1,7 @@
 using LineTen.TechnicalTask.Data.DbContexts;
 using LineTen.TechnicalTask.Data.Entities.Sql;
 using LineTen.TechnicalTask.Data.Tests.Fixtures;
+using LineTen.TechnicalTask.Data.Tests.Helpers;
 using LineTen.TechnicalTask.Domain.Enums;
 
 namespace LineTen.TechnicalTask.Data.Tests.DbContexts
@@ -8,33 +9,6 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
     public class TechnicalTestContextTests : IClassFixture<TechnicalTestContextFixture>
     {
         private readonly TechnicalTestContextFixture _fixture;
-
-        private static readonly CustomerEntity _customerEntity = new()
-        {
-            Id = 1,
-            FirstName = "John",
-            LastName = "Doe",
-            Phone = "078 0156 5740",
-            Email = "john.doe@lineten.com"
-        };
-
-        private static readonly ProductEntity _productEntity = new()
-        {
-            Id = 1,
-            Name = "Awesome Product",
-            Description = "This is a really awesome product!",
-            SKU = "ABC-12345-S-BL"
-        };
-
-        private static readonly OrderEntity _orderEntity = new()
-        {
-            Id = 1,
-            CustomerId = _customerEntity.Id,
-            ProductId = _productEntity.Id,
-            Status = (int)OrderStatus.New,
-            CreatedDate = DateTime.UtcNow,
-            UpdatedDate = DateTime.UtcNow
-        };
 
         public TechnicalTestContextTests(TechnicalTestContextFixture fixture)
         {
@@ -49,272 +23,263 @@ namespace LineTen.TechnicalTask.Data.Tests.DbContexts
         }
 
         [Fact]
-        public void CanSetAndGetCustomers()
+        public void CanAddAndUpdateMultipleCustomers()
         {
-            // Act
+            // Arrange
+            var customers = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateCustomerEntity)
+                .ToList();
+
             using (var dbContext = _fixture.CreateDbContext())
             {
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
-                dbContext.Customers.Add(_customerEntity);
+                dbContext.Customers.AddRange(customers);
+                dbContext.SaveChanges();
+            }
+
+            // Act
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                foreach (var customer in customers)
+                {
+                    var customerToUpdate = dbContext.Customers.Single(c => c.Id == customer.Id);
+                    customerToUpdate.FirstName = "Updated" + customer.FirstName;
+                }
+
                 dbContext.SaveChanges();
             }
 
             // Assert
             using (var dbContext = _fixture.CreateDbContext())
             {
-                var savedCustomer = dbContext.Customers.Single();
-                savedCustomer.FirstName.Should().Be(_customerEntity.FirstName);
-                savedCustomer.LastName.Should().Be(_customerEntity.LastName);
-                savedCustomer.Phone.Should().Be(_customerEntity.Phone);
-                savedCustomer.Email.Should().Be(_customerEntity.Email);
+                foreach (var customer in customers)
+                {
+                    var updatedCustomer = dbContext.Customers.Single(c => c.Id == customer.Id);
+                    updatedCustomer.FirstName.Should().Be("Updated" + customer.FirstName);
+                }
             }
         }
 
         [Fact]
-        public void CanUpdateCustomer()
+        public void CanDeleteSomeCustomersAndCheckRemaining()
         {
             // Arrange
-            const string newName = "Jane";
-
-            // Safety net
-            newName.Should().NotBe(_customerEntity.FirstName);
+            var customers = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateCustomerEntity)
+                .ToList();
 
             using (var dbContext = _fixture.CreateDbContext())
             {
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
-                dbContext.Customers.Add(_customerEntity);
+
+                dbContext.Customers.AddRange(customers);
                 dbContext.SaveChanges();
             }
 
             // Act
             using (var dbContext = _fixture.CreateDbContext())
             {
-                var customerToUpdate = dbContext.Customers.Single();
-                customerToUpdate.FirstName = newName;
+                var customersToDelete = dbContext.Customers.Where(c => c.Id % 2 == 0);
+                dbContext.Customers.RemoveRange(customersToDelete);
                 dbContext.SaveChanges();
             }
 
-            // Assert        
+            var expectedRemainingCustomers = customers.Where(c => c.Id % 2 != 0);
+
+            // Assert
             using (var dbContext = _fixture.CreateDbContext())
             {
-                var updatedCustomer = dbContext.Customers.Single();
-                updatedCustomer.FirstName.Should().Be(newName);
-                updatedCustomer.LastName.Should().Be(_customerEntity.LastName);
+                var remainingCustomers = dbContext.Customers.ToList();
+                remainingCustomers.Should().HaveCount(5);
+                remainingCustomers.Should().BeEquivalentTo(expectedRemainingCustomers, options => options.Excluding(o => o.Orders));
             }
         }
 
         [Fact]
-        public void CanDeleteCustomer()
+        public void CanAddAndUpdateMultipleProducts()
         {
             // Arrange
+            var products = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateProductEntity)
+                .ToList();
+
             using (var dbContext = _fixture.CreateDbContext())
             {
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
-                dbContext.Customers.Add(_customerEntity);
+                dbContext.Products.AddRange(products);
                 dbContext.SaveChanges();
             }
 
             // Act
             using (var dbContext = _fixture.CreateDbContext())
             {
-                var customerToDelete = dbContext.Customers.Single();
-                dbContext.Customers.Remove(customerToDelete);
+                foreach (var product in products)
+                {
+                    var productToUpdate = dbContext.Products.Single(p => p.Id == product.Id);
+                    productToUpdate.Description = "Updated" + product.Description;
+                }
+
                 dbContext.SaveChanges();
             }
 
             // Assert
             using (var dbContext = _fixture.CreateDbContext())
             {
-                dbContext.Customers.Should().BeEmpty();
+                foreach (var product in products)
+                {
+                    var updatedProduct = dbContext.Products.Single(p => p.Id == product.Id);
+                    updatedProduct.Description.Should().Be("Updated" + product.Description);
+                }
             }
         }
 
         [Fact]
-        public void CanSetAndGetProducts()
+        public void CanDeleteSomeProductsAndCheckRemaining()
         {
-            // Act
+            // Arrange
+            var products = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateProductEntity)
+                .ToList();
+
             using (var dbContext = _fixture.CreateDbContext())
             {
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
-                dbContext.Products.Add(_productEntity);
+
+                dbContext.Products.AddRange(products);
+                dbContext.SaveChanges();
+            }
+
+            // Act
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                var productsToDelete = dbContext.Products.Where(p => p.Id % 2 == 0);
+                dbContext.Products.RemoveRange(productsToDelete);
+                dbContext.SaveChanges();
+            }
+
+            var expectedRemainingProducts = products.Where(p => p.Id % 2 != 0);
+
+            // Assert
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                var remainingProducts = dbContext.Products.ToList();
+                remainingProducts.Should().HaveCount(5);
+                remainingProducts.Should().BeEquivalentTo(expectedRemainingProducts, options => options.Excluding(o => o.Orders));
+            }
+        }
+
+        [Fact]
+        public void CanAddAndUpdateMultipleOrders()
+        {
+            // Arrange
+            var customers = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateCustomerEntity)
+                .ToList();
+
+            var products = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateProductEntity)
+                .ToList();
+
+            var orders = new List<OrderEntity>();
+
+            foreach (var customer in customers)
+            {
+                foreach (var product in products)
+                {
+                    var order = TestHelper.CreateOrderEntity(orders.Count + 1, customer.Id, product.Id);
+                    orders.Add(order);
+                }
+            }
+
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+
+                dbContext.Customers.AddRange(customers);
+                dbContext.Products.AddRange(products);
+                dbContext.Orders.AddRange(orders);
+                dbContext.SaveChanges();
+            }
+
+            // Act
+            using (var dbContext = _fixture.CreateDbContext())
+            {
+                foreach (var order in orders)
+                {
+                    var orderToUpdate = dbContext.Orders.Single(o => o.Id == order.Id);
+                    orderToUpdate.Status = (int)OrderStatus.Completed;
+                }
+
                 dbContext.SaveChanges();
             }
 
             // Assert
             using (var dbContext = _fixture.CreateDbContext())
             {
-                var savedProduct = dbContext.Products.Single();
-                savedProduct.Name.Should().Be(_productEntity.Name);
-                savedProduct.Description.Should().Be(_productEntity.Description);
-                savedProduct.SKU.Should().Be(_productEntity.SKU);
+                foreach (var order in orders)
+                {
+                    var updatedOrder = dbContext.Orders.Single(o => o.Id == order.Id);
+                    updatedOrder.Status.Should().Be((int)OrderStatus.Completed);
+                }
             }
         }
 
         [Fact]
-        public void CanUpdateProduct()
+        public void CanDeleteOrdersAndCheckRemaining()
         {
             // Arrange
-            const string newDescription = "Improved description";
+            var customers = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateCustomerEntity)
+                .ToList();
 
-            // Safety net
-            newDescription.Should().NotBe(_productEntity.Description);
+            var products = Enumerable.Range(1, 10)
+                .Select(TestHelper.CreateProductEntity)
+                .ToList();
+
+            var orders = new List<OrderEntity>();
+
+            foreach (var customer in customers)
+            {
+                foreach (var product in products)
+                {
+                    var order = TestHelper.CreateOrderEntity(orders.Count + 1, customer.Id, product.Id);
+                    orders.Add(order);
+                }
+            }
 
             using (var dbContext = _fixture.CreateDbContext())
             {
                 dbContext.Database.EnsureDeleted();
                 dbContext.Database.EnsureCreated();
-                dbContext.Products.Add(_productEntity);
+
+                dbContext.Customers.AddRange(customers);
+                dbContext.Products.AddRange(products);
+                dbContext.Orders.AddRange(orders);
                 dbContext.SaveChanges();
             }
 
             // Act
             using (var dbContext = _fixture.CreateDbContext())
             {
-                var productToUpdate = dbContext.Products.Single();
-                productToUpdate.Description = newDescription;
+                var ordersToDelete = dbContext.Orders.Where(o => o.Id % 2 == 0);
+                dbContext.Orders.RemoveRange(ordersToDelete);
                 dbContext.SaveChanges();
             }
 
-            // Assert        
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                var updatedProduct = dbContext.Products.Single();
-                updatedProduct.Description.Should().Be(newDescription);
-                updatedProduct.Name.Should().Be(_productEntity.Name);
-            }
-        }
-
-        [Fact]
-        public void CanDeleteProduct()
-        {
-            // Arrange
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-                dbContext.Products.Add(_productEntity);
-                dbContext.SaveChanges();
-            }
-
-            // Act
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                var productToDelete = dbContext.Products.Single();
-                dbContext.Products.Remove(productToDelete);
-                dbContext.SaveChanges();
-            }
+            var expectedRemainingOrders = orders.Where(o => o.Id % 2 != 0);
 
             // Assert
             using (var dbContext = _fixture.CreateDbContext())
             {
-                dbContext.Products.Should().BeEmpty();
-            }
-        }
-
-        [Fact]
-        public void CanSetAndGetOrders()
-        {
-            // Arrange
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-
-                // Add customer and product to the database
-                dbContext.Customers.Add(_customerEntity);
-                dbContext.Products.Add(_productEntity);
-                dbContext.SaveChanges();
-            }
-
-            // Act
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                dbContext.Orders.Add(_orderEntity);
-                dbContext.SaveChanges();
-            }
-
-            // Assert
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                var savedOrder = dbContext.Orders.Single();
-                savedOrder.Status.Should().Be(_orderEntity.Status);
-                savedOrder.CreatedDate.Should().Be(savedOrder.CreatedDate);
-                savedOrder.UpdatedDate.Should().Be(savedOrder.UpdatedDate);
-            }
-        }
-        
-        [Fact]
-        public void CanUpdateOrderStatus()
-        {
-            // Arrange
-            const int newStatus = (int)OrderStatus.Completed;
-
-            // Safety net
-            newStatus.Should().NotBe(_orderEntity.Status);
-
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-
-                // Add customer, product, and order to the database
-                dbContext.Customers.Add(_customerEntity);
-                dbContext.Products.Add(_productEntity);
-                dbContext.Orders.Add(_orderEntity);
-                dbContext.SaveChanges();
-            }
-
-            // Act
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                var orderToUpdate = dbContext.Orders.Single();
-                orderToUpdate.Status = newStatus;
-                orderToUpdate.UpdatedDate = DateTime.UtcNow;
-                dbContext.SaveChanges();
-            }
-
-            // Assert        
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                var updatedOrder = dbContext.Orders.Single();
-                updatedOrder.Status.Should().Be(newStatus);
-                updatedOrder.CreatedDate.Should().Be(updatedOrder.CreatedDate);
-                updatedOrder.UpdatedDate.Should().NotBe(_orderEntity.UpdatedDate);
-            }
-        }
-
-        [Fact]
-        public void CanDeleteOrder()
-        {
-            // Arrange
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-
-                // Add customer, product, and order to the database
-                dbContext.Customers.Add(_customerEntity);
-                dbContext.Products.Add(_productEntity);
-                dbContext.Orders.Add(_orderEntity);
-                dbContext.SaveChanges();
-            }
-
-            // Act
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                var orderToDelete = dbContext.Orders.Single();
-                dbContext.Orders.Remove(orderToDelete);
-                dbContext.SaveChanges();
-            }
-
-            // Assert
-            using (var dbContext = _fixture.CreateDbContext())
-            {
-                dbContext.Orders.Should().BeEmpty();
+                var remainingOrders = dbContext.Orders.ToList();
+                remainingOrders.Should().HaveCount(50);
+                remainingOrders.Should().BeEquivalentTo(expectedRemainingOrders, options => 
+                    options.Excluding(o => o.Product).Excluding(o => o.Customer));
             }
         }
     }
