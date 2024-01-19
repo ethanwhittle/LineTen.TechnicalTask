@@ -29,9 +29,17 @@ Please consider the following schema:
 # Initiative Taken:
 - I made the class libraries .net8, if desired we could always use .netstandard or multi-target if these will be consumed elsewhere
 - For the sake of time, I am opting to not leave class/method Documentation Comments
-- Opted to use the older paradigm for services Program.cs due to static anaylsis issues with projet build
+- Opted to use the older paradigm for services Program.cs and Startup.cs due to static anaylsis issues with projet build and to make integration tests easier
 - Opted to use a Data Mapper / ORM pattern for Repository layers, that way we could introduce any technology for the repository and the contract will still be met
 - Opted to introduce an `Id` column to the Orders as I would argue the table design is weird, if you assume a composite primary key - Each customer could only order a product once!
 - Noted that we can add Orders for customers and/or products when they don't exist - FKs a future enhancement!
 - Originally planned to implement Data integration tests. Opted not to due to time constraints and as I have "kind of" achieved this with the inmemory based unit tests
 - Introduced 2 additional projects: `*.Service.Domain` and `*.Service.Domain.Tests` so that I can reference the Response Models elsewhere
+- Used Swagger UI so we have an interface to test with
+
+# Setup
+Before running the Integration tests / Service locally you will need to install the following: 
+
+## SQL Server Express (Local Db)
+At the time of writing this was tested against SQL Server Express 2019 and Visual Studio 2022
+![] https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb?view=sql-server-ver16

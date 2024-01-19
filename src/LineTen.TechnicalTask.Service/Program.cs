@@ -4,33 +4,20 @@ namespace LineTen.TechnicalTask.Service
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            ArgumentNullException.ThrowIfNull(args);
 
-            // Add services to the container.
-            builder.Services.AddControllers();
+            CreateHostBuilder(args).Build().Run();
+        }
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            ArgumentNullException.ThrowIfNull(args);
 
-            builder.Services.AddSwaggerGen();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
         }
     }
 }
