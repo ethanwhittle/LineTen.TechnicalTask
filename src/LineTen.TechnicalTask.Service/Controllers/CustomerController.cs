@@ -83,6 +83,11 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateCustomerAsync([FromBody] UpdateCustomerRequest updateCustomerRequest, CancellationToken cancellationToken = default)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var updatedCustomer = _mapper.Map<Customer>(updateCustomerRequest);
             var result = await _customerService.UpdateCustomerAsync(updatedCustomer, cancellationToken).ConfigureAwait(false);
 
