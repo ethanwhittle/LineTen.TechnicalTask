@@ -6,6 +6,7 @@ namespace LineTen.TechnicalTask.Service.Domain.Models
     public class UpdateOrderRequest
     {
         [Required(ErrorMessage = "Id is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Id must be greater than zero.")]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "ProductId is required.")]

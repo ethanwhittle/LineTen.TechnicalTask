@@ -5,6 +5,7 @@ namespace LineTen.TechnicalTask.Service.Domain.Models
     public class UpdateCustomerRequest
     {
         [Required(ErrorMessage = "The customer Id is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Id must be greater than zero.")]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "First Name is required.")]
