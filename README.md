@@ -33,15 +33,8 @@ Please consider the following schema:
 - Opted to use a Data Mapper / ORM pattern for Repository layers, that way we could introduce any technology for the repository and the contract will still be met
 - Opted to introduce an `Id` column to the Orders as I would argue the table design is weird, if you assume a composite primary key - Each customer could only order a product once!
 - Noted that we can add Orders for customers and/or products when they don't exist - FKs a future enhancement!
-- Originally planned to implement Data integration tests. Opted not to due to time constraints and as I have "kind of" achieved this with the inmemory based unit tests
+- Originally planned to implement Data integration tests. Opted not to due to time constraints and as I have "kind of" achieved this with the InMemory based unit tests
 - Introduced 2 additional projects: `*.Service.Domain` and `*.Service.Domain.Tests` so that I can reference the Response Models elsewhere
 - Used Swagger UI so we have an interface to test with
 - Opted to not use logger delegates and templates to save time
-- Spent a long time trying to work out why any tests I wrote for foreign key violations, i.e. adding an order without the relevant customer or product do not error - Turns out the InMemory provider doesn't support them.
-
-# Setup
-Before running the Integration tests / Service locally you will need to install the following: 
-
-## SQL Server Express (Local Db)
-At the time of writing this was tested against SQL Server Express 2019 and Visual Studio 2022
-![] https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb?view=sql-server-ver16
+- Spent a long time trying to work out why any tests I wrote for foreign key violations, i.e. adding an order without the relevant customer or product do not error - Turns out the InMemory provider doesn't support them...
