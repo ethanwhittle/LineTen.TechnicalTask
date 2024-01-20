@@ -38,3 +38,4 @@ Please consider the following schema:
 - Used Swagger UI so we have an interface to test with
 - Opted to not use logger delegates and templates to save time
 - Spent a long time trying to work out why any tests I wrote for foreign key violations, i.e. adding an order without the relevant customer or product do not error - Turns out the InMemory provider doesn't support them...
+- Dockerised but fails to work as Docker doesn't support LocalDb. Could try the InMemory Db or even just connect to a SQL Server instance
