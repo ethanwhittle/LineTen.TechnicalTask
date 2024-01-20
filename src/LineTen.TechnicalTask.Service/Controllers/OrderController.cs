@@ -12,14 +12,17 @@ namespace LineTen.TechnicalTask.Service.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
+        private readonly ILogger<OrderController> _logger;
 
-        public OrderController(IOrderService orderService, IMapper mapper)
+        public OrderController(IOrderService orderService, IMapper mapper, ILogger<OrderController> logger)
         {
             ArgumentNullException.ThrowIfNull(orderService);
             ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
 
             _orderService = orderService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -28,16 +31,29 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddOrderAsync([FromBody] AddOrderRequest addOrderRequest, CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var newOrder = _mapper.Map<Order>(addOrderRequest);
+                var result = await _orderService.AddOrderAsync(newOrder, cancellationToken).ConfigureAwait(false);
+                var resultModel = _mapper.Map<OrderResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var newOrder = _mapper.Map<Order>(addOrderRequest);
-            var result = await _orderService.AddOrderAsync(newOrder, cancellationToken).ConfigureAwait(false);
-            var resultModel = _mapper.Map<OrderResponse>(result);
-
-            return Ok(resultModel);
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Invalid arguments in AddOrderAsync");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in AddOrderAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
 
         [HttpGet]
@@ -45,10 +61,18 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(typeof(List<OrderResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllOrdersAsync(CancellationToken cancellationToken = default)
         {
-            var result = await _orderService.GetAllOrdersAsync(cancellationToken).ConfigureAwait(false);
-            var resultModels = _mapper.Map<List<OrderResponse>>(result);
+            try
+            {
+                var result = await _orderService.GetAllOrdersAsync(cancellationToken).ConfigureAwait(false);
+                var resultModels = _mapper.Map<List<OrderResponse>>(result);
 
-            return Ok(resultModels);
+                return Ok(resultModels);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetAllOrdersAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
 
         [HttpGet("{id}")]
@@ -58,21 +82,29 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOrderAsync(int id, CancellationToken cancellationToken = default)
         {
-            if (id == default)
+            try
             {
-                return BadRequest("Invalid Id in the request path.");
+                if (id == default)
+                {
+                    return BadRequest("Invalid Id in the request path.");
+                }
+
+                var result = await _orderService.GetOrderAsync(id, cancellationToken).ConfigureAwait(false);
+
+                if (result is null)
+                {
+                    return NotFound();
+                }
+
+                var resultModel = _mapper.Map<OrderResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var result = await _orderService.GetOrderAsync(id, cancellationToken).ConfigureAwait(false);
-
-            if (result is null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, $"An error occurred in GetOrderAsync for order ID {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
-
-            var resultModel = _mapper.Map<OrderResponse>(result);
-
-            return Ok(resultModel);
         }
 
         [HttpPut]
@@ -81,22 +113,30 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateOrderAsync([FromBody] UpdateOrderRequest updateOrderRequest, CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var updatedOrder = _mapper.Map<Order>(updateOrderRequest);
+                var result = await _orderService.UpdateOrderAsync(updatedOrder, cancellationToken).ConfigureAwait(false);
+
+                if (result is null)
+                {
+                    return NotFound();
+                }
+
+                var resultModel = _mapper.Map<OrderResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var updatedOrder = _mapper.Map<Order>(updateOrderRequest);
-            var result = await _orderService.UpdateOrderAsync(updatedOrder, cancellationToken).ConfigureAwait(false);
-
-            if (result is null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "An error occurred in UpdateOrderAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
-
-            var resultModel = _mapper.Map<OrderResponse>(result);
-
-            return Ok(resultModel);
         }
 
         [HttpDelete("{id}")]
@@ -104,8 +144,16 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteOrderAsync(int id, CancellationToken cancellationToken = default)
         {
-            var result = await _orderService.DeleteOrderAsync(id, cancellationToken).ConfigureAwait(false);
-            return result ? Ok() : NotFound();
+            try
+            {
+                var result = await _orderService.DeleteOrderAsync(id, cancellationToken).ConfigureAwait(false);
+                return result ? Ok() : NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred in DeleteOrderAsync for order ID {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
     }
 }

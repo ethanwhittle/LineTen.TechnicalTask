@@ -13,24 +13,37 @@ namespace LineTen.TechnicalTask.Service
     {
         public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration)
+        public IWebHostEnvironment Environment { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(environment);
 
             Configuration = configuration;
+            Environment = environment;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            ArgumentNullException.ThrowIfNull(services);
+
             services.AddControllers();
 
             services
                 .AddDbContext<TechnicalTestContext>(options =>
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("TechnicalTestDatabase"));
-                    options.EnableServiceProviderCaching(false);
-                    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                    options.EnableSensitiveDataLogging(true);
+                    if (Environment.IsEnvironment("IntegrationTests"))
+                    {
+                        options.UseInMemoryDatabase(databaseName: "IntegrationTestsDatabase");
+                    }
+                    else
+                    {
+                        options.UseSqlServer(Configuration.GetConnectionString("TechnicalTestDatabase"));
+                        options.EnableServiceProviderCaching(false);
+                        options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                        options.EnableSensitiveDataLogging(true);
+                    }
                 })
                 .AddScoped<ICustomerRepository, SqlCustomerRepository>()
                 .AddScoped<IProductRepository, SqlProductRepository>()
@@ -50,12 +63,11 @@ namespace LineTen.TechnicalTask.Service
             services.AddSwaggerGen();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             ArgumentNullException.ThrowIfNull(app);
-            ArgumentNullException.ThrowIfNull(env);
 
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment() || Environment.IsEnvironment("IntegrationTests"))
             {
                 using (var scope = app.ApplicationServices.CreateScope())
                 {

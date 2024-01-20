@@ -65,5 +65,11 @@ dotnet_diagnostic.CA2227.severity = none
 # CA1031:Do not catch general exception types
 dotnet_diagnostic.CA1031.severity = none
 
+CA1848: Use the LoggerMessage delegates
+dotnet_diagnostic.CA1848.severity = none
+
+CA2254: Template should be a static expression
+dotnet_diagnostic.CA2254.severity = none
+
 [*]
 dotnet_diagnostic.SA0001.severity = none

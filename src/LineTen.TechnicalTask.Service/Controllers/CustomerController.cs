@@ -6,22 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LineTen.TechnicalTask.Service.Controllers
 {
-    // ENHANCE: Authorization
-
     [ApiController]
     [Route("api/customers")]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
         private readonly IMapper _mapper;
+        private readonly ILogger<CustomerController> _logger;
 
-        public CustomerController(ICustomerService customerService, IMapper mapper)
+        public CustomerController(ICustomerService customerService, IMapper mapper, ILogger<CustomerController> logger)
         {
             ArgumentNullException.ThrowIfNull(customerService);
             ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
 
             _customerService = customerService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -30,16 +31,29 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddCustomerAsync([FromBody] AddCustomerRequest addCustomerRequest, CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var newCustomer = _mapper.Map<Customer>(addCustomerRequest);
+                var result = await _customerService.AddCustomerAsync(newCustomer, cancellationToken).ConfigureAwait(false);
+                var resultModel = _mapper.Map<CustomerResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var newCustomer = _mapper.Map<Customer>(addCustomerRequest);
-            var result = await _customerService.AddCustomerAsync(newCustomer, cancellationToken).ConfigureAwait(false);
-            var resultModel = _mapper.Map<CustomerResponse>(result);
-
-            return Ok(resultModel);
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Invalid arguments in AddCustomerAsync");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in AddCustomerAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
 
         [HttpGet]
@@ -47,10 +61,18 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(typeof(List<CustomerResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllCustomersAsync(CancellationToken cancellationToken = default)
         {
-            var result = await _customerService.GetAllCustomersAsync(cancellationToken).ConfigureAwait(false);
-            var resultModels = _mapper.Map<List<CustomerResponse>>(result);
+            try
+            {
+                var result = await _customerService.GetAllCustomersAsync(cancellationToken).ConfigureAwait(false);
+                var resultModels = _mapper.Map<List<CustomerResponse>>(result);
 
-            return Ok(resultModels);
+                return Ok(resultModels);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetAllCustomersAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
 
         [HttpGet("{id}")]
@@ -60,21 +82,29 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCustomerAsync(int id, CancellationToken cancellationToken = default)
         {
-            if (id == default)
+            try
             {
-                return BadRequest("Invalid Id in the request path.");
+                if (id == default)
+                {
+                    return BadRequest("Invalid Id in the request path.");
+                }
+
+                var result = await _customerService.GetCustomerAsync(id, cancellationToken).ConfigureAwait(false);
+
+                if (result is null)
+                {
+                    return NotFound();
+                }
+
+                var resultModel = _mapper.Map<CustomerResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var result = await _customerService.GetCustomerAsync(id, cancellationToken).ConfigureAwait(false);
-
-            if (result is null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, $"An error occurred in GetCustomerAsync for customer ID {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
-
-            var resultModel = _mapper.Map<CustomerResponse>(result);
-
-            return Ok(resultModel);
         }
 
         [HttpPut]
@@ -83,22 +113,30 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateCustomerAsync([FromBody] UpdateCustomerRequest updateCustomerRequest, CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var updatedCustomer = _mapper.Map<Customer>(updateCustomerRequest);
+                var result = await _customerService.UpdateCustomerAsync(updatedCustomer, cancellationToken).ConfigureAwait(false);
+
+                if (result is null)
+                {
+                    return NotFound();
+                }
+
+                var resultModel = _mapper.Map<CustomerResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var updatedCustomer = _mapper.Map<Customer>(updateCustomerRequest);
-            var result = await _customerService.UpdateCustomerAsync(updatedCustomer, cancellationToken).ConfigureAwait(false);
-
-            if (result is null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "An error occurred in UpdateCustomerAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
-
-            var resultModel = _mapper.Map<CustomerResponse>(result);
-
-            return Ok(resultModel);
         }
 
         [HttpDelete("{id}")]
@@ -106,8 +144,16 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteCustomerAsync(int id, CancellationToken cancellationToken = default)
         {
-            var result = await _customerService.DeleteCustomerAsync(id, cancellationToken).ConfigureAwait(false);
-            return result ? Ok() : NotFound();
+            try
+            {
+                var result = await _customerService.DeleteCustomerAsync(id, cancellationToken).ConfigureAwait(false);
+                return result ? Ok() : NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred in DeleteCustomerAsync for customer ID {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
     }
 }

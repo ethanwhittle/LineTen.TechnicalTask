@@ -12,14 +12,17 @@ namespace LineTen.TechnicalTask.Service.Controllers
     {
         private readonly IProductService _productService;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProductController> _logger;
 
-        public ProductController(IProductService productService, IMapper mapper)
+        public ProductController(IProductService productService, IMapper mapper, ILogger<ProductController> logger)
         {
             ArgumentNullException.ThrowIfNull(productService);
             ArgumentNullException.ThrowIfNull(mapper);
+            ArgumentNullException.ThrowIfNull(logger);
 
             _productService = productService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -28,16 +31,29 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddProductAsync([FromBody] AddProductRequest addProductRequest, CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var newProduct = _mapper.Map<Product>(addProductRequest);
+                var result = await _productService.AddProductAsync(newProduct, cancellationToken).ConfigureAwait(false);
+                var resultModel = _mapper.Map<ProductResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var newProduct = _mapper.Map<Product>(addProductRequest);
-            var result = await _productService.AddProductAsync(newProduct, cancellationToken).ConfigureAwait(false);
-            var resultModel = _mapper.Map<ProductResponse>(result);
-
-            return Ok(resultModel);
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Invalid arguments in AddProductAsync");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in AddProductAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
 
         [HttpGet]
@@ -45,10 +61,18 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(typeof(List<ProductResponse>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllProductsAsync(CancellationToken cancellationToken = default)
         {
-            var result = await _productService.GetAllProductsAsync(cancellationToken).ConfigureAwait(false);
-            var resultModels = _mapper.Map<List<ProductResponse>>(result);
+            try
+            {
+                var result = await _productService.GetAllProductsAsync(cancellationToken).ConfigureAwait(false);
+                var resultModels = _mapper.Map<List<ProductResponse>>(result);
 
-            return Ok(resultModels);
+                return Ok(resultModels);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetAllProductsAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
 
         [HttpGet("{id}")]
@@ -58,21 +82,29 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProductAsync(int id, CancellationToken cancellationToken = default)
         {
-            if (id == default)
+            try
             {
-                return BadRequest("Invalid Id in the request path.");
+                if (id == default)
+                {
+                    return BadRequest("Invalid Id in the request path.");
+                }
+
+                var result = await _productService.GetProductAsync(id, cancellationToken).ConfigureAwait(false);
+
+                if (result is null)
+                {
+                    return NotFound();
+                }
+
+                var resultModel = _mapper.Map<ProductResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var result = await _productService.GetProductAsync(id, cancellationToken).ConfigureAwait(false);
-
-            if (result is null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, $"An error occurred in GetProductAsync for product ID {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
-
-            var resultModel = _mapper.Map<ProductResponse>(result);
-
-            return Ok(resultModel);
         }
 
         [HttpPut]
@@ -81,22 +113,30 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateProductAsync([FromBody] UpdateProductRequest updateProductRequest, CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var updatedProduct = _mapper.Map<Product>(updateProductRequest);
+                var result = await _productService.UpdateProductAsync(updatedProduct, cancellationToken).ConfigureAwait(false);
+
+                if (result is null)
+                {
+                    return NotFound();
+                }
+
+                var resultModel = _mapper.Map<ProductResponse>(result);
+
+                return Ok(resultModel);
             }
-
-            var updatedProduct = _mapper.Map<Product>(updateProductRequest);
-            var result = await _productService.UpdateProductAsync(updatedProduct, cancellationToken).ConfigureAwait(false);
-
-            if (result is null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "An error occurred in UpdateProductAsync");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
-
-            var resultModel = _mapper.Map<ProductResponse>(result);
-
-            return Ok(resultModel);
         }
 
         [HttpDelete("{id}")]
@@ -104,8 +144,16 @@ namespace LineTen.TechnicalTask.Service.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteProductAsync(int id, CancellationToken cancellationToken = default)
         {
-            var result = await _productService.DeleteProductAsync(id, cancellationToken).ConfigureAwait(false);
-            return result ? Ok() : NotFound();
+            try
+            {
+                var result = await _productService.DeleteProductAsync(id, cancellationToken).ConfigureAwait(false);
+                return result ? Ok() : NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred in DeleteProductAsync for product ID {id}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using LineTen.TechnicalTask.Service.Domain.Models;
 using LineTen.TechnicalTask.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace LineTen.TechnicalTask.Service.Tests.Controllers
 {
@@ -14,6 +15,7 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
         private readonly ProductController _testClass;
         private readonly IProductService _productService;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProductController> _logger;
 
         public ProductControllerTests()
         {
@@ -24,14 +26,16 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
                 cfg.AddProfile<ResponseModelProfile>();
             }).CreateMapper();
 
-            _testClass = new ProductController(_productService, _mapper);
+            _logger = Substitute.For<ILogger<ProductController>>();
+
+            _testClass = new ProductController(_productService, _mapper, _logger);
         }
 
         [Fact]
         public void CanConstruct()
         {
             // Act
-            var instance = new ProductController(_productService, _mapper);
+            var instance = new ProductController(_productService, _mapper, _logger);
 
             // Assert
             instance.Should().NotBeNull();
@@ -40,13 +44,19 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
         [Fact]
         public void CannotConstructWithNullProductService()
         {
-            FluentActions.Invoking(() => new ProductController(default(IProductService), _mapper)).Should().Throw<ArgumentNullException>().WithParameterName("productService");
+            FluentActions.Invoking(() => new ProductController(default(IProductService), _mapper, _logger)).Should().Throw<ArgumentNullException>().WithParameterName("productService");
         }
 
         [Fact]
         public void CannotConstructWithNullMapper()
         {
-            FluentActions.Invoking(() => new ProductController(_productService, default(IMapper))).Should().Throw<ArgumentNullException>().WithParameterName("mapper");
+            FluentActions.Invoking(() => new ProductController(_productService, default(IMapper), _logger)).Should().Throw<ArgumentNullException>().WithParameterName("mapper");
+        }
+
+        [Fact]
+        public void CannotConstructWithNullLogger()
+        {
+            FluentActions.Invoking(() => new ProductController(_productService, _mapper, default(ILogger<ProductController>))).Should().Throw<ArgumentNullException>().WithParameterName("logger");
         }
 
         [Fact]

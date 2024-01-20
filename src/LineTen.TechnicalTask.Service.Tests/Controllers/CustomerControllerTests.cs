@@ -1,4 +1,5 @@
 using AutoMapper;
+using Castle.Core.Logging;
 using LineTen.TechnicalTask.Domain.Models;
 using LineTen.TechnicalTask.Service.Controllers;
 using LineTen.TechnicalTask.Service.Domain.Mappings;
@@ -6,6 +7,7 @@ using LineTen.TechnicalTask.Service.Domain.Models;
 using LineTen.TechnicalTask.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace LineTen.TechnicalTask.Service.Tests.Controllers
 {
@@ -14,6 +16,7 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
         private readonly CustomerController _testClass;
         private readonly ICustomerService _customerService;
         private readonly IMapper _mapper;
+        private readonly ILogger<CustomerController> _logger;
 
         public CustomerControllerTests()
         {
@@ -24,14 +27,16 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
                 cfg.AddProfile<ResponseModelProfile>();
             }).CreateMapper();
 
-            _testClass = new CustomerController(_customerService, _mapper);
+            _logger = Substitute.For<ILogger<CustomerController>>();
+
+            _testClass = new CustomerController(_customerService, _mapper, _logger);
         }
 
         [Fact]
         public void CanConstruct()
         {
             // Act
-            var instance = new CustomerController(_customerService, _mapper);
+            var instance = new CustomerController(_customerService, _mapper, _logger);
 
             // Assert
             instance.Should().NotBeNull();
@@ -40,13 +45,19 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
         [Fact]
         public void CannotConstructWithNullCustomerService()
         {
-            FluentActions.Invoking(() => new CustomerController(default(ICustomerService), _mapper)).Should().Throw<ArgumentNullException>().WithParameterName("customerService");
+            FluentActions.Invoking(() => new CustomerController(default(ICustomerService), _mapper, _logger)).Should().Throw<ArgumentNullException>().WithParameterName("customerService");
         }
 
         [Fact]
         public void CannotConstructWithNullMapper()
         {
-            FluentActions.Invoking(() => new CustomerController(_customerService, default(IMapper))).Should().Throw<ArgumentNullException>().WithParameterName("mapper");
+            FluentActions.Invoking(() => new CustomerController(_customerService, default(IMapper), _logger)).Should().Throw<ArgumentNullException>().WithParameterName("mapper");
+        }
+
+        [Fact]
+        public void CannotConstructWithNullLogger()
+        {
+            FluentActions.Invoking(() => new CustomerController(_customerService, _mapper, default(ILogger<CustomerController>))).Should().Throw<ArgumentNullException>().WithParameterName("logger");
         }
 
         [Fact]

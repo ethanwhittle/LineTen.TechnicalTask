@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Castle.Core.Logging;
 using LineTen.TechnicalTask.Domain.Enums;
 using LineTen.TechnicalTask.Domain.Models;
 using LineTen.TechnicalTask.Service.Controllers;
@@ -7,6 +8,7 @@ using LineTen.TechnicalTask.Service.Domain.Models;
 using LineTen.TechnicalTask.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace LineTen.TechnicalTask.Service.Tests.Controllers
 {
@@ -15,6 +17,7 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
         private readonly OrderController _testClass;
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
+        private readonly ILogger<OrderController> _logger;
 
         public OrderControllerTests()
         {
@@ -25,14 +28,16 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
                 cfg.AddProfile<ResponseModelProfile>();
             }).CreateMapper();
 
-            _testClass = new OrderController(_orderService, _mapper);
+            _logger = Substitute.For<ILogger<OrderController>>();
+
+            _testClass = new OrderController(_orderService, _mapper, _logger);
         }
 
         [Fact]
         public void CanConstruct()
         {
             // Act
-            var instance = new OrderController(_orderService, _mapper);
+            var instance = new OrderController(_orderService, _mapper, _logger);
 
             // Assert
             instance.Should().NotBeNull();
@@ -41,13 +46,19 @@ namespace LineTen.TechnicalTask.Service.Tests.Controllers
         [Fact]
         public void CannotConstructWithNullOrderService()
         {
-            FluentActions.Invoking(() => new OrderController(default(IOrderService), _mapper)).Should().Throw<ArgumentNullException>().WithParameterName("orderService");
+            FluentActions.Invoking(() => new OrderController(default(IOrderService), _mapper, _logger)).Should().Throw<ArgumentNullException>().WithParameterName("orderService");
         }
 
         [Fact]
         public void CannotConstructWithNullMapper()
         {
-            FluentActions.Invoking(() => new OrderController(_orderService, default(IMapper))).Should().Throw<ArgumentNullException>().WithParameterName("mapper");
+            FluentActions.Invoking(() => new OrderController(_orderService, default(IMapper), _logger)).Should().Throw<ArgumentNullException>().WithParameterName("mapper");
+        }
+
+        [Fact]
+        public void CannotConstructWithNullLogger()
+        {
+            FluentActions.Invoking(() => new OrderController(_orderService, _mapper, default(ILogger<OrderController>))).Should().Throw<ArgumentNullException>().WithParameterName("logger");
         }
 
         [Fact]

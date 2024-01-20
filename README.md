@@ -36,6 +36,8 @@ Please consider the following schema:
 - Originally planned to implement Data integration tests. Opted not to due to time constraints and as I have "kind of" achieved this with the inmemory based unit tests
 - Introduced 2 additional projects: `*.Service.Domain` and `*.Service.Domain.Tests` so that I can reference the Response Models elsewhere
 - Used Swagger UI so we have an interface to test with
+- Opted to not use logger delegates and templates to save time
+- Spent a long time trying to work out why any tests I wrote for foreign key violations, i.e. adding an order without the relevant customer or product do not error - Turns out the InMemory provider doesn't support them.
 
 # Setup
 Before running the Integration tests / Service locally you will need to install the following: 
